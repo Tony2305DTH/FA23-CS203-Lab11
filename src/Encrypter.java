@@ -1,12 +1,18 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Encrypter {
 
     private int shift;
-    private String encrypted;
+    private String decrypted = "";
+    private String encrypted = "";
+
+    String lowCaseAlphabet = "abcdefghijklmnopqrstuvwxyz";
+    String upCaseAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     /**
      * Default Constructor
@@ -34,6 +40,38 @@ public class Encrypter {
      */
     public void encrypt(String inputFilePath, String encryptedFilePath) throws Exception {
         //TODO: Call the read method, encrypt the file contents, and then write to new file
+    	String inputFile = readFile(inputFilePath);
+    	
+    	int shiftedPosition; 
+    	char c;
+
+	    for (int i = 0; i < inputFile.length(); i++) {
+
+	    	if (lowCaseAlphabet.contains(inputFile.substring(i,i + 1)))  {  	
+		        int position = lowCaseAlphabet.indexOf(inputFile.charAt(i));
+		        shiftedPosition = (position +shift)%26;
+		    	c = lowCaseAlphabet.charAt(shiftedPosition);
+	        	encrypted += c;
+			}
+			else if (upCaseAlphabet.contains(inputFile.substring(i,i + 1)))  {  	
+		        int position = upCaseAlphabet.indexOf(inputFile.charAt(i));
+		        shiftedPosition = (position +shift)%26;
+		    	c = upCaseAlphabet.charAt(shiftedPosition);
+	        	encrypted += c;
+	    		}
+			else  if(inputFile.substring(i,i + 1) == "\n"){
+		    	
+				encrypted += "\n";	
+			}
+			
+			else
+				encrypted += inputFile.substring(i,i + 1);
+
+	    }
+    	
+    	writeFile(encrypted, encryptedFilePath);
+
+    	    	
     }
 
     /**
@@ -45,6 +83,43 @@ public class Encrypter {
      */
     public void decrypt(String messageFilePath, String decryptedFilePath) throws Exception {
         //TODO: Call the read method, decrypt the file contents, and then write to new file
+    	String encryptedText = readFile(messageFilePath);
+    	int shiftedPosition;
+    	char c;
+    	
+	    for (int i = 0; i < encryptedText.length(); i++) {
+
+	    	if (lowCaseAlphabet.contains(encryptedText.substring(i,i + 1)))  {  	
+	    		int position = lowCaseAlphabet.indexOf(encryptedText.charAt(i));
+		        shiftedPosition = (position - shift)%26;
+		        if (shiftedPosition < 0) {
+		        	shiftedPosition = shiftedPosition + 26;
+		        }
+		    	c = lowCaseAlphabet.charAt(shiftedPosition);
+		    	decrypted += c;
+    		}
+    		else if (upCaseAlphabet.contains(encryptedText.substring(i,i + 1)))  {  	
+		        int position = upCaseAlphabet.indexOf(encryptedText.charAt(i));
+		        shiftedPosition = (position - shift)%26;
+		        if (shiftedPosition < 0) {
+		        	shiftedPosition = shiftedPosition + 26;
+		        }
+		    	c = upCaseAlphabet.charAt(shiftedPosition);
+		    	decrypted += c;
+	    		}
+    		else  if(encryptedText.substring(i,i + 1) == "\n"){
+		    	
+    			decrypted += "\n";	
+    		}
+    		
+    		else
+    			decrypted += encryptedText.substring(i,i + 1);
+
+	    }
+   
+	   // encryptedText.rem
+    	writeFile(decrypted, decryptedFilePath);
+   
     }
 
     /**
@@ -57,8 +132,14 @@ public class Encrypter {
     private static String readFile(String filePath) throws Exception {
         String message = "";
         //TODO: Read file from filePath
+        try (Scanner fileScanner = new Scanner(Paths.get(filePath))) {
+        	while(fileScanner.hasNextLine()) {
+        		message += fileScanner.nextLine() + "\n";
+        	}  	
+        }
+        
         return message;
-    }
+        }
 
     /**
      * Writes data to a file.
@@ -68,6 +149,12 @@ public class Encrypter {
      */
     private static void writeFile(String data, String filePath) {
         //TODO: Write to filePath
+    	try (PrintWriter write = new PrintWriter(filePath)){
+    		write.print(data);
+    	}catch(Exception e) {
+    		System.out.println("error " + e.toString());
+    	}
+  
     }
 
     /**
