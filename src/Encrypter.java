@@ -55,7 +55,7 @@ public class Encrypter {
 			}
 			else if (upCaseAlphabet.contains(inputFile.substring(i,i + 1)))  {  	
 		        int position = upCaseAlphabet.indexOf(inputFile.charAt(i));
-		        shiftedPosition = (position +shift)%26;
+		        shiftedPosition = (position + shift)%26;
 		    	c = upCaseAlphabet.charAt(shiftedPosition);
 	        	encrypted += c;
 	    		}
@@ -151,6 +151,8 @@ public class Encrypter {
         //TODO: Write to filePath
     	try (PrintWriter write = new PrintWriter(filePath)){
     		write.print(data);
+    		
+    		write.close();
     	}catch(Exception e) {
     		System.out.println("error " + e.toString());
     	}
